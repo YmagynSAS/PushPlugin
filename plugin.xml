@@ -2,24 +2,20 @@
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
 xmlns:android="http://schemas.android.com/apk/res/android"
 id="org.apache.cordova.gcm.PushPlugin"
-    version="2.0.1">
-
+    version="0.0.1">
+	
     <name>PushPlugin</name>
 	<author>Bob Easterday</author>
-	
 	<description>
 		This plugin allows your application to receive push notifications on both Android and iOS devices. The Android implementation uses Google Cloud Messaging whereas the iOS version is based on Apple APNS Notifications
 	</description>
-
 	<license>MIT</license>
-
-	<js-module src="www/PushNotification.js" name="PushNotification">
-        <clobbers target="window.PushNotification />
+	
+	<js-module src="www/PushNotification.js" name="PushPlugin">
+        <clobbers target="window.PushPlugin" />
     </js-module>
 	
-	<!-- android -->
 	<platform name="android">
-
 		<config-file target="res/xml/config.xml" parent="/*">
 			<feature name="PushPlugin" >
 				<param name="android-package" value="org.apache.cordova.gcm.PushPlugin"/>
@@ -31,8 +27,8 @@ id="org.apache.cordova.gcm.PushPlugin"
 			<uses-permission android:name="android.permission.GET_ACCOUNTS" />
 			<uses-permission android:name="android.permission.WAKE_LOCK" />
 			<uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
-			<permission android:name="@string/packageName.permission.C2D_MESSAGE" android:protectionLevel="signature" />
-			<uses-permission android:name="@string/packageName.permission.C2D_MESSAGE" />
+			<permission android:name="$PACKAGE_NAME.permission.C2D_MESSAGE" android:protectionLevel="signature" />
+			<uses-permission android:name="$PACKAGE_NAME.permission.C2D_MESSAGE" />
 		</config-file>
 
 		<config-file target="AndroidManifest.xml" parent="/manifest/application">
@@ -41,7 +37,7 @@ id="org.apache.cordova.gcm.PushPlugin"
 				<intent-filter>
 					<action android:name="com.google.android.c2dm.intent.RECEIVE" />
 					<action android:name="com.google.android.c2dm.intent.REGISTRATION" />
-					<category android:name="@string/packageName" />
+					<category android:name="$PACKAGE_NAME" />
 				</intent-filter>
 			</receiver>
 			<service android:name="org.apache.cordova.gcm.GCMIntentService" />

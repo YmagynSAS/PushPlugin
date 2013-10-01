@@ -1,4 +1,4 @@
-package com.plugin.gcm;
+package org.apache.cordova.gcm;
 
 import android.app.Activity;
 import android.content.Intent;
