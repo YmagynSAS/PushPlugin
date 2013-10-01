@@ -26,7 +26,7 @@
 
 		<config-file target="res/xml/config.xml" parent="/*">
 			<feature name="PushPlugin" >
-				<param name="android-package" value="com.plugin.gcm.PushPlugin"/>
+				<param name="android-package" value="org.apache.cordova.gcm.PushPlugin"/>
 			</feature>
 		</config-file>
 
@@ -52,12 +52,11 @@
 		</config-file>
 
 		<source-file src="src/android/libs/gcm.jar" target-dir="libs/" />
-		<source-file src="src/android/com/plugin/gcm/CordovaGCMBroadcastReceiver.java" target-dir="src/org/apache/cordova/gcm/" />
-		<source-file src="src/android/com/plugin/gcm/GCMIntentService.java" target-dir="src/org/apache/cordova/gcm/" />
-		<source-file src="src/android/com/plugin/gcm/PushHandlerActivity.java" target-dir="src/org/apache/cordova/gcm/" />
-		<source-file src="src/android/com/plugin/gcm/PushPlugin.java" target-dir="src/org/apache/cordova/gcm/" />
-		<source-file src="src/android/com/plugin/android-support-v13.jar" target-dir="libs/" />
-		
+		<source-file src="src/android/libs/android-support-v13.jar" target-dir="libs/" />
+		<source-file src="src/android/org/apache/cordova/gcm/CordovaGCMBroadcastReceiver.java" target-dir="src/org/apache/cordova/gcm/" />
+		<source-file src="src/android/org/apache/cordova/gcm/GCMIntentService.java" target-dir="src/org/apache/cordova/gcm/" />
+		<source-file src="src/android/org/apache/cordova/gcm/PushHandlerActivity.java" target-dir="src/org/apache/cordova/gcm/" />
+		<source-file src="src/android/org/apache/cordova/gcm/PushPlugin.java" target-dir="src/org/apache/cordova/gcm/" />
 	</platform>
 
 	<!-- ios -->
