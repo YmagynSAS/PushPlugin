@@ -1,9 +1,13 @@
+var cordova = window.cordova || window.Cordova;
+var exec = require('cordova/exec');
+
+
 var PushNotification = function() {
 };
 
 
 // Call this to register for push notifications. Content of [options] depends on whether we are working with APNS (iOS) or GCM (Android)
-PushNotification.prototype.register = function(successCallback, errorCallback, options) {
+PushNotification.register = function(successCallback, errorCallback, options) {
     if (errorCallback == null) { errorCallback = function() {}}
 
     if (typeof errorCallback != "function")  {
@@ -16,11 +20,11 @@ PushNotification.prototype.register = function(successCallback, errorCallback, o
         return
     }
 
-	cordova.exec(successCallback, errorCallback, "PushPlugin", "register", [options]);
+	exec(successCallback, errorCallback, "PushPlugin", "register", [options]);
 };
 
 // Call this to unregister for push notifications
-PushNotification.prototype.unregister = function(successCallback, errorCallback) {
+PushNotification.unregister = function(successCallback, errorCallback) {
     if (errorCallback == null) { errorCallback = function() {}}
 
     if (typeof errorCallback != "function")  {
@@ -33,12 +37,12 @@ PushNotification.prototype.unregister = function(successCallback, errorCallback)
         return
     }
 
-     cordova.exec(successCallback, errorCallback, "PushPlugin", "unregister", []);
+    exec(successCallback, errorCallback, "PushPlugin", "unregister", []);
 };
  
  
 // Call this to set the application icon badge
-PushNotification.prototype.setApplicationIconBadgeNumber = function(successCallback, errorCallback, badge) {
+PushNotification.setApplicationIconBadgeNumber = function(successCallback, errorCallback, badge) {
     if (errorCallback == null) { errorCallback = function() {}}
 
     if (typeof errorCallback != "function")  {
@@ -51,14 +55,8 @@ PushNotification.prototype.setApplicationIconBadgeNumber = function(successCallb
         return
     }
 
-    cordova.exec(successCallback, errorCallback, "PushPlugin", "setApplicationIconBadgeNumber", [{badge: badge}]);
+    exec(successCallback, errorCallback, "PushPlugin", "setApplicationIconBadgeNumber", [{badge: badge}]);
 };
 
 //-------------------------------------------------------------------
-
-if(!window.plugins) {
-    window.plugins = {};
-}
-if (!window.plugins.pushNotification) {
-    window.plugins.pushNotification = new PushNotification();
-}
+module.exports = PushNotification;

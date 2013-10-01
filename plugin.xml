@@ -13,8 +13,10 @@
 
 	<license>MIT</license>
 
-	<asset src="www/PushNotification.js" target="PushNotification.js" />
-
+	<js-module src="www/PushNotification.js" name="PushNotification">
+        <clobbers target="window.PushNotification />
+    </js-module>
+	
 	<engines>
 		<engine name="cordova" version=">=3.0.0" />
 	</engines>	
@@ -38,8 +40,8 @@
 		</config-file>
 
 		<config-file target="AndroidManifest.xml" parent="/manifest/application">
-			<activity android:name="com.plugin.gcm.PushHandlerActivity"/>
-			<receiver android:name="com.plugin.gcm.CordovaGCMBroadcastReceiver" android:permission="com.google.android.c2dm.permission.SEND" >
+			<activity android:name="org.apache.cordova.gcm.PushHandlerActivity"/>
+			<receiver android:name="org.apache.cordova.gcm.CordovaGCMBroadcastReceiver" android:permission="com.google.android.c2dm.permission.SEND" >
 				<intent-filter>
 					<action android:name="com.google.android.c2dm.intent.RECEIVE" />
 					<action android:name="com.google.android.c2dm.intent.REGISTRATION" />
@@ -50,10 +52,10 @@
 		</config-file>
 
 		<source-file src="src/android/libs/gcm.jar" target-dir="libs/" />
-		<source-file src="src/android/com/plugin/gcm/CordovaGCMBroadcastReceiver.java" target-dir="src/com/plugin/gcm/" />
-		<source-file src="src/android/com/plugin/gcm/GCMIntentService.java" target-dir="src/com/plugin/gcm/" />
-		<source-file src="src/android/com/plugin/gcm/PushHandlerActivity.java" target-dir="src/com/plugin/gcm/" />
-		<source-file src="src/android/com/plugin/gcm/PushPlugin.java" target-dir="src/com/plugin/gcm/" />
+		<source-file src="src/android/com/plugin/gcm/CordovaGCMBroadcastReceiver.java" target-dir="src/org/apache/cordova/gcm/" />
+		<source-file src="src/android/com/plugin/gcm/GCMIntentService.java" target-dir="src/org/apache/cordova/gcm/" />
+		<source-file src="src/android/com/plugin/gcm/PushHandlerActivity.java" target-dir="src/org/apache/cordova/gcm/" />
+		<source-file src="src/android/com/plugin/gcm/PushPlugin.java" target-dir="src/org/apache/cordova/gcm/" />
 		<source-file src="src/android/com/plugin/android-support-v13.jar" target-dir="libs/" />
 		
 	</platform>
