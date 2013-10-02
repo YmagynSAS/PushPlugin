@@ -13,6 +13,7 @@ import android.util.Log;
 import org.apache.cordova.CordovaWebView;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
+import org.apache.cordova.PluginResult;
 
 import com.google.android.gcm.*;
 
@@ -42,7 +43,7 @@ public class PushPlugin extends CordovaPlugin {
 
 	@Override
 	public boolean execute(String action, JSONArray data, CallbackContext callbackContext) {
-
+		PluginResult pr;
 		boolean result = false;
 
 		Log.v(TAG, "execute: action=" + action);
@@ -64,9 +65,13 @@ public class PushPlugin extends CordovaPlugin {
 
 				GCMRegistrar.register(getApplicationContext(), gSenderID);
 				result = true;
+				 pr = new PluginResult(PluginResult.Status.OK);
+	                callbackContext.sendPluginResult(pr);
 			} catch (JSONException e) {
 				Log.e(TAG, "execute: Got JSON Exception " + e.getMessage());
 				result = false;
+				pr = new PluginResult(PluginResult.Status.ERROR);
+                callbackContext.sendPluginResult(pr);
 			}
 
 			if ( gCachedExtras != null) {
@@ -81,6 +86,8 @@ public class PushPlugin extends CordovaPlugin {
 
 			Log.v(TAG, "UNREGISTER");
 			result = true;
+			pr = new PluginResult(PluginResult.Status.OK);
+            callbackContext.sendPluginResult(pr);
 		} else {
 			result = false;
 			Log.e(TAG, "Invalid action : " + action);

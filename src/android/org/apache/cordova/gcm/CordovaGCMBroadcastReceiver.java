@@ -13,7 +13,7 @@ public class CordovaGCMBroadcastReceiver extends GCMBroadcastReceiver {
 	
 	@Override
 	protected String getGCMIntentServiceClassName(Context context) {
-    	return "com.plugin.gcm" + DEFAULT_INTENT_SERVICE_CLASS_NAME;
+    	return "org.apache.cordova.gcm" + DEFAULT_INTENT_SERVICE_CLASS_NAME;
     }
 	
 }
