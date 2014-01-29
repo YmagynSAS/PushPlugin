@@ -5,11 +5,11 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.webkit.WebStorage.Origin;
 
 public class PushHandlerActivity extends Activity
 {
 	private static String TAG = "PushHandlerActivity"; 
-
 	/*
 	 * this activity will be started if the user touches a notification that we own. 
 	 * We send it's data off to the push plugin for processing.
@@ -30,7 +30,7 @@ public class PushHandlerActivity extends Activity
 		finish();
 
 		if (!isPushPluginActive) {
-			forceMainActivityReload();
+			forceMainActivityReload(isPushPluginActive);
 		}
 	}
 
@@ -49,7 +49,7 @@ public class PushHandlerActivity extends Activity
 			if ( !isPushPluginActive ) { 
 				originalExtras.putBoolean("coldstart", true);
 			}
-
+			
 			PushPlugin.sendExtras(originalExtras);
 		}
 	}
@@ -57,10 +57,10 @@ public class PushHandlerActivity extends Activity
 	/**
 	 * Forces the main activity to re-launch if it's unloaded.
 	 */
-	private void forceMainActivityReload()
-	{
+	private void forceMainActivityReload(boolean isPushPluginActive)
+	{	
 		PackageManager pm = getPackageManager();
-		Intent launchIntent = pm.getLaunchIntentForPackage(getApplicationContext().getPackageName());    		
+		Intent launchIntent = pm.getLaunchIntentForPackage(getApplicationContext().getPackageName());
 		startActivity(launchIntent);
 	}
 
