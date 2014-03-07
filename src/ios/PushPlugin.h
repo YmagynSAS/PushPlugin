@@ -49,6 +49,8 @@
 - (void)didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken;
 - (void)didFailToRegisterForRemoteNotificationsWithError:(NSError *)error;
 
+- (void)setApplicationIconBadgeNumber:(NSMutableArray *)arguments withDict:(NSMutableDictionary *)options;
+
 - (void)setNotificationMessage:(NSDictionary *)notification;
 - (void)notificationReceived;
 
