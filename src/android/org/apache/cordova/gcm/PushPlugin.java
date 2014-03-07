@@ -10,6 +10,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 
+import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CordovaWebView;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
@@ -23,7 +24,7 @@ import com.google.android.gcm.*;
 
 public class PushPlugin extends CordovaPlugin {
 	public static final String TAG = "PushPlugin";
-	
+
 	public static final String REGISTER = "register";
 	public static final String UNREGISTER = "unregister";
 	public static final String EXIT = "exit";
@@ -32,6 +33,7 @@ public class PushPlugin extends CordovaPlugin {
 	private static String gECB;
 	private static String gSenderID;
 	private static Bundle gCachedExtras = null;
+	private static boolean gForeground = false;
 
 	/**
 	 * Gets the application context from cordova's main activity.
@@ -54,7 +56,7 @@ public class PushPlugin extends CordovaPlugin {
 
 			try {
 				JSONObject jo = data.getJSONObject(0);
-				
+
 				gWebView = this.webView;
 				Log.v(TAG, "execute: jo=" + jo.toString());
 
@@ -65,13 +67,13 @@ public class PushPlugin extends CordovaPlugin {
 
 				GCMRegistrar.register(getApplicationContext(), gSenderID);
 				result = true;
-				 pr = new PluginResult(PluginResult.Status.OK);
-	                callbackContext.sendPluginResult(pr);
+				pr = new PluginResult(PluginResult.Status.OK);
+				callbackContext.sendPluginResult(pr);
 			} catch (JSONException e) {
 				Log.e(TAG, "execute: Got JSON Exception " + e.getMessage());
 				result = false;
 				pr = new PluginResult(PluginResult.Status.ERROR);
-                callbackContext.sendPluginResult(pr);
+				callbackContext.sendPluginResult(pr);
 			}
 
 			if ( gCachedExtras != null) {
@@ -79,7 +81,7 @@ public class PushPlugin extends CordovaPlugin {
 				sendExtras(gCachedExtras);
 				gCachedExtras = null;
 			}
-			
+
 		} else if (UNREGISTER.equals(action)) {
 
 			GCMRegistrar.unregister(getApplicationContext());
@@ -87,7 +89,7 @@ public class PushPlugin extends CordovaPlugin {
 			Log.v(TAG, "UNREGISTER");
 			result = true;
 			pr = new PluginResult(PluginResult.Status.OK);
-            callbackContext.sendPluginResult(pr);
+			callbackContext.sendPluginResult(pr);
 		} else {
 			result = false;
 			Log.e(TAG, "Invalid action : " + action);
@@ -100,17 +102,28 @@ public class PushPlugin extends CordovaPlugin {
 	 * Sends a json object to the client as parameter to a method which is defined in gECB.
 	 */
 	public static void sendJavascript(JSONObject _json) {
-		final JSONObject t = _json;
-		new android.os.Handler().postDelayed(new Runnable(){
-			public void run(){
-				String _d = "javascript:" + gECB + "(" + t.toString() + ")";
-				Log.v(TAG, "sendJavascript: " + _d);
+		
+		try {
+			_json.getBoolean("coldstart");
+			final JSONObject t = _json;
+			new android.os.Handler().postDelayed(new Runnable(){
+				public void run(){
+					String _d = "javascript:" + gECB + "(" + t.toString() + ")";
+					Log.v(TAG, "sendJavascript: " + _d);
 
-				if (gECB != null && gWebView != null) {
-					gWebView.sendJavascript(_d); 
+					if (gECB != null && gWebView != null) {
+						gWebView.sendJavascript(_d); 
+					}
 				}
+			}, 1500);
+		} catch (JSONException e) {
+			String _d = "javascript:" + gECB + "(" + _json.toString() + ")";
+			Log.v(TAG, "sendJavascript: " + _d);
+
+			if (gECB != null && gWebView != null) {
+				gWebView.sendJavascript(_d); 
 			}
-		}, 1500);
+		}
 	}
 
 	/*
@@ -128,24 +141,24 @@ public class PushPlugin extends CordovaPlugin {
 			}
 		}
 	}
-	
+
 	/*
 	 * serializes a bundle to JSON.
 	 */
-    private static JSONObject convertBundleToJson(Bundle extras)
-    {
+	private static JSONObject convertBundleToJson(Bundle extras)
+	{
 		try
 		{
 			JSONObject json;
 			json = new JSONObject().put("event", "message");
-        
+
 			JSONObject jsondata = new JSONObject();
 			Iterator<String> it = extras.keySet().iterator();
 			while (it.hasNext())
 			{
 				String key = it.next();
 				Object value = extras.get(key);	
-        	
+
 				// System data from Android
 				if (key.equals("from") || key.equals("collapse_key"))
 				{
@@ -166,10 +179,10 @@ public class PushPlugin extends CordovaPlugin {
 					{
 						json.put(key, value);
 					}
-        		
+
 					if ( value instanceof String ) {
-					// Try to figure out if the value is another JSON object
-						
+						// Try to figure out if the value is another JSON object
+
 						String strValue = (String)value;
 						if (strValue.startsWith("{")) {
 							try {
@@ -201,7 +214,7 @@ public class PushPlugin extends CordovaPlugin {
 				}
 			} // while
 			json.put("payload", jsondata);
-        
+
 			Log.v(TAG, "extrasToJSON: " + json.toString());
 
 			return json;
@@ -211,18 +224,42 @@ public class PushPlugin extends CordovaPlugin {
 			Log.e(TAG, "extrasToJSON: JSON exception");
 		}        	
 		return null;      	
-    }
-    
-    public static boolean isActive()
+	}
+
+	public static boolean isActive()
+	{
+		return gWebView != null;
+	}
+
+	public static boolean isInForeground()
     {
-    	return gWebView != null;
+      return gForeground;
     }
-    
+
+	 @Override
+	    public void initialize(CordovaInterface cordova, CordovaWebView webView) {
+	        super.initialize(cordova, webView);
+	        gForeground = true;
+	  }
+	
+	 public void onPause(boolean multitasking) {
+	        super.onPause(multitasking);
+	        gForeground = false;
+	 }
+
+	
+	@Override
+    public void onResume(boolean multitasking) {
+        super.onResume(multitasking);
+        gForeground = true;
+    }
+	
 	public void onDestroy() 
 	{
 		GCMRegistrar.onDestroy(getApplicationContext());
 		gWebView = null;
 		gECB = null;
+		gForeground = false;
 		super.onDestroy();
 	}
 }

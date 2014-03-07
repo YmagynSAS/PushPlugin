@@ -25,7 +25,7 @@ public class GCMIntentService extends GCMBaseIntentService {
 
 	public static final int NOTIFICATION_ID = 237;
 	private static final String TAG = "GCMIntentService";
-	
+
 	public GCMIntentService() {
 		super("GCMIntentService");
 	}
@@ -69,11 +69,17 @@ public class GCMIntentService extends GCMBaseIntentService {
 		Bundle extras = intent.getExtras();
 		if (extras != null)
 		{
-			PushPlugin.sendExtras(extras);
+			if (PushPlugin.isInForeground()) {
+				extras.putBoolean("foreground", true);
+				PushPlugin.sendExtras(extras);
+			}
+			else {
+				extras.putBoolean("foreground", false);
 
-			// Send a notification if there is a message
-			if (extras.getString("message").length() != 0) {
-				createNotification(context, extras);
+				// Send a notification if there is a message
+				if (extras.getString("message") != null && extras.getString("message").length() != 0) {
+					createNotification(context, extras);
+				}
 			}
 		}
 	}
@@ -87,15 +93,15 @@ public class GCMIntentService extends GCMBaseIntentService {
 		notificationIntent.putExtra("pushBundle", extras);
 
 		PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-		
+
 		NotificationCompat.Builder mBuilder =
-			new NotificationCompat.Builder(context)
-				.setDefaults(Notification.DEFAULT_ALL)
-				.setSmallIcon(context.getApplicationInfo().icon)
-				.setWhen(System.currentTimeMillis())
-				.setContentTitle(appName)
-				.setTicker(appName)
-				.setContentIntent(contentIntent);
+				new NotificationCompat.Builder(context)
+		.setDefaults(Notification.DEFAULT_ALL)
+		.setSmallIcon(context.getApplicationInfo().icon)
+		.setWhen(System.currentTimeMillis())
+		.setContentTitle(appName)
+		.setTicker(appName)
+		.setContentIntent(contentIntent);
 
 		String message = extras.getString("message");
 		if (message != null) {
@@ -108,26 +114,26 @@ public class GCMIntentService extends GCMBaseIntentService {
 		if (msgcnt != null) {
 			mBuilder.setNumber(Integer.parseInt(msgcnt));
 		}
-		
+
 		mNotificationManager.notify((String) appName, NOTIFICATION_ID, mBuilder.build());
 	}
-	
+
 	public static void cancelNotification(Context context)
 	{
 		NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 		mNotificationManager.cancel((String)getAppName(context), NOTIFICATION_ID);	
 	}
-	
+
 	private static String getAppName(Context context)
 	{
 		CharSequence appName = 
 				context
-					.getPackageManager()
-					.getApplicationLabel(context.getApplicationInfo());
-		
+				.getPackageManager()
+				.getApplicationLabel(context.getApplicationInfo());
+
 		return (String)appName;
 	}
-	
+
 	@Override
 	public void onError(Context context, String errorId) {
 		Log.e(TAG, "onError - errorId: " + errorId);
